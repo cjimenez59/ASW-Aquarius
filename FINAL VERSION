@@ -1,0 +1,163 @@
+user-editable vars
+const unsigned int DHT_PIN = 7;
+char FILENAME[255] = "LOG.TXT";
+
+// SD libs, file object, and data string
+#include <SD.h>
+#include <SPI.h>
+File LOG;
+String DATA;
+
+// variable for time
+float time;
+
+// bar30 lib, object, and floats
+#include <MS5837.h>
+MS5837 bar;
+float externalTemperature, altitude, depth, pressure;
+
+// DHT lib, object, and floats
+#include <dht.h>
+dht DHT;
+float internalTemperature, internalHumidity;
+
+
+// lux sensor lib and vars
+#include <SparkFunTSL2561.h>
+#include <Wire.h>
+unsigned int data0, data1;
+SFE_TSL2561 light;
+boolean gain;     // Gain setting, 0 = X1, 1 = X16;
+unsigned int ms;  // Integration ("shutter") time in milliseconds
+double lux;
+
+// declare baud rate
+const unsigned int BAUD_RATE = 9600;
+
+// declare header string
+String HEADERS = "Time (sec), Internal Temperature (deg C), Internal Humidity (%), Light (lux), Pressure (mbar), External Temperature (deg C), Depth (m), Altitude (m)";
+
+void setup() {
+  // begin serial communication
+  Serial.begin(BAUD_RATE);
+
+  // give serial time to initialize
+  delay(1000);
+
+  // initialize SD card
+  Serial.print("Initializing SD card...");
+  if (!SD.begin(BUILTIN_SDCARD)) {
+    Serial.println("card failed or not present");
+  } else {
+    Serial.println("card initialized");
+  }  
+
+  // attempt to open file
+  LOG = SD.open(FILENAME, FILE_WRITE);
+  if (!LOG) {
+    Serial.print("Failed to open ");
+    Serial.println(FILENAME);
+  } else {
+    Serial.print("Writing to ");
+    Serial.println(FILENAME);
+    LOG.println(HEADERS);
+    LOG.close();
+  }
+
+  // Set up lux sensor
+  light.begin();
+  gain = 0;
+  unsigned char time = 2;
+  light.setTiming(gain,time,ms);
+  light.setPowerUp();
+
+  // begin bar30
+  Wire.begin();
+  bar.init();
+
+  // write headers to serial
+  if (Serial) {
+    Serial.println(HEADERS);
+  }
+}
+
+void loop() {
+  delay(ms);
+
+  time_convert();
+  Serial.print("Seconds: "); Serial.println(time);
+ Serial.println("The time is: " + String(time));
+  
+  // get lux
+  if (light.getData(data0,data1)) {   
+    light.getLux(gain,ms,data0,data1,lux);
+  } else {
+    // getData() returned false because of an I2C error, inform the user.
+    byte error = light.getError();
+    printError(error);
+  }
+  
+  // update DHT sensor
+  DHT.read11(DHT_PIN);
+  internalTemperature = DHT.temperature;
+  internalHumidity = DHT.humidity;
+
+  // update bar30
+  bar.read();
+  pressure = bar.pressure();
+  externalTemperature = bar.temperature();
+  depth = bar.depth();
+  altitude = bar.altitude();
+  
+  // write data to string
+  DATA = String(time) + "," + String(internalTemperature) + "," + String(internalHumidity) + "," + String(lux) + "," + String(pressure) + "," + String(externalTemperature) + "," + String(depth) + "," + String(altitude);
+
+  // open log
+  LOG = SD.open("LOG.TXT", FILE_WRITE);
+
+  // log to file if it exists
+  if (LOG) {
+    LOG.println(DATA);
+    LOG.close();
+  }
+
+  // log to serial if exists
+  if (Serial) {
+    Serial.println(DATA);
+  }
+
+  // delay
+  delay(1000);  
+}
+
+void time_convert(){
+  time = millis()/1000;
+}
+
+void printError(byte error) {
+  // If there's an I2C error, this function will
+  // print out an explanation.
+  Serial.print("I2C error: ");
+  Serial.print(error,DEC);
+  Serial.print(", ");
+  
+  switch(error) {
+    case 0:
+      Serial.println("success");
+      break;
+    case 1:
+      Serial.println("data too long for transmit buffer");
+      break;
+    case 2:
+      Serial.println("received NACK on address (disconnected?)");
+      break;
+    case 3:
+      Serial.println("received NACK on data");
+      break;
+    case 4:
+      Serial.println("other error");
+      break;
+    default:
+      Serial.println("unknown error");
+  }
+}
