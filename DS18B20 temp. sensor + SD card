@@ -1,5 +1,10 @@
+// Libraries
+
+// DS18B20 temperature sensor 
 #include <OneWire.h>
 #include <DallasTemperature.h>
+
+// external SD card
 #include <SD.h> // SD card
 #include <SPI.h> // SD card
 
@@ -20,13 +25,7 @@ DeviceAddress tempDeviceAddress; // We'll use this variable to store a found dev
 float tempC;
 
 String dataString1=""; // holds the data to be written to the SD card
-//String dataString2="";
-//String dataString3="";
-//String dataString4="";
 float sensorReading1 = 1.00; // value read from your first sensor
-float sensorReading2 = 0.00; // value read from your second sensor
-float sensorReading3 = 0.00; // value read from your third sensor
-float sensorReading4 = 0.00; // value read from your fourth sensor
 
 File sensorData;
 
@@ -91,6 +90,7 @@ void setup(void)
 }
 
 // function to print the temperature for a device
+// prints temperature readings for Celsius and Fahrenheit twice each
 void printTemperature(DeviceAddress deviceAddress)
 {
   // method 1 - slower
@@ -155,13 +155,7 @@ prepare_data();
 void prepare_data(){
     // build the data string
   dataString1 = String(tempC) + "," + String(DallasTemperature::toFahrenheit(tempC));
- // dataString2 =
- // dataString3 =
- // dataString4 =
   Serial.println(dataString1); //Only to show on the Serial Monitor.
-//  Serial.println(dataString2);
-//  Serial.println(dataString3);
-//  Serial.println(dataString4);
 }
 
 void saveData(){
@@ -171,9 +165,6 @@ void saveData(){
       sensorData = SD.open("data.csv", FILE_WRITE);
       if (sensorData){
       sensorData.println(dataString1);
-//      sensorData.println(dataString2);
-//      sensorData.println(dataString3);
- //     sensorData.println(dataString4);
       sensorData.close(); // close the file
     }
   }
