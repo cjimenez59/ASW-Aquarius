@@ -21,4 +21,4 @@ Code + sensor versions:
 1) DS18B20
 2) DS18B20 + external SD card
 3) DS18B20 + external SD card + DHT
-4) FINAL: DS18B20 + external SD card + DHT + LUX + Bar 30 ( last two devices were added at same time)
+4) FINAL: Teensy built-in SD card + DHT + LUX + Bar 30
