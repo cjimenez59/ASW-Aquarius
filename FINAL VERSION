@@ -16,34 +16,26 @@
 
 
 // Variables
-
-
-const unsigned int DHT_PIN = 7;
-char FILENAME[255] = "LOG.TXT";
-
-// SD libs, file object, and data string
-File LOG;
-String DATA;
-
-
-
-// bar30 lib, object, and floats
-MS5837 bar;
-float externalTemperature, altitude, depth, pressure;
-
-// DHT lib, object, and floats
-
+// DHT 
+const unsigned int DHT_PIN = 7; // defines pin sensor will use
 dht DHT;
-float internalTemperature, internalHumidity;
+float internalTemperature, internalHumidity; // for data string
 
-
-// lux sensor lib and vars
-
+// LUX
 unsigned int data0, data1;
-SFE_TSL2561 light;
+SFE_TSL2561 light; // defines object
 boolean gain;     // Gain setting, 0 = X1, 1 = X16;
 unsigned int ms;  // Integration ("shutter") time in milliseconds
 double lux;
+
+// Bar 30
+MS5837 bar; // defines object
+float externalTemperature, altitude, depth, pressure; // for data string
+
+// Built-in SD card
+char FILENAME[255] = "LOG.TXT";
+File LOG; // file SD writes to
+String DATA;
 
 // variable for time
 float time;
@@ -101,7 +93,7 @@ void setup() {
 void loop() {
   delay(ms);
 
-  time_convert();
+  time_convert(); // prints time to serial 
   Serial.print("Seconds: "); Serial.println(time);
  Serial.println("The time is: " + String(time));
   
@@ -147,6 +139,9 @@ void loop() {
   delay(1000);  
 }
 
+// FUNCTIONS 
+
+// prints time
 void time_convert(){
   time = millis()/1000;
 }
