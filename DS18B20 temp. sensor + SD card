@@ -8,6 +8,12 @@
 #include <SD.h> // SD card
 #include <SPI.h> // SD card
 
+
+
+
+// Variables 
+
+// Temp. sensor
 // Data wire is plugged into port 2 on the Arduino
 #define ONE_WIRE_BUS 2
 #define TEMPERATURE_PRECISION 16 // Lower resolution
@@ -22,8 +28,10 @@ int numberOfDevices; // Number of temperature devices found
 
 DeviceAddress tempDeviceAddress; // We'll use this variable to store a found device address
 
-float tempC;
+float tempC; // will be used in data string
 
+
+// SD card
 String dataString1=""; // holds the data to be written to the SD card
 float sensorReading1 = 1.00; // value read from your first sensor
 
@@ -132,12 +140,13 @@ void loop(void)
     //else ghost device! Check your power requirements and cabling
 
   }
-prepare_data();
-  saveData(); // save to SD card  
+  // call SD card functions
+prepare_data(); // builds data string
+  saveData(); // save data to SD card  
 }
 
 
-// SD CARD ///////////////////////
+// SD card functions
   void sd_setup(){
   Serial.print("Initializing SD card...");
   // IF FAILURE OCCURS: 
@@ -196,6 +205,7 @@ String listFiles(File dir)
      Serial.println("closed: ");
    }
 }
+// Temp sensor function
 // function to print a device address
 void printAddress(DeviceAddress deviceAddress)
 {
