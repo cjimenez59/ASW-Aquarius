@@ -1,35 +1,52 @@
-user-editable vars
+// Libraries
+
+// DHT
+#include <dht.h>
+
+// LUX
+#include <SparkFunTSL2561.h>
+#include <Wire.h>
+
+// Bar 30
+#include <MS5837.h>
+
+// Built-in SD card
+#include <SD.h>
+#include <SPI.h>
+
+
+// Variables
+
+
 const unsigned int DHT_PIN = 7;
 char FILENAME[255] = "LOG.TXT";
 
 // SD libs, file object, and data string
-#include <SD.h>
-#include <SPI.h>
 File LOG;
 String DATA;
 
-// variable for time
-float time;
+
 
 // bar30 lib, object, and floats
-#include <MS5837.h>
 MS5837 bar;
 float externalTemperature, altitude, depth, pressure;
 
 // DHT lib, object, and floats
-#include <dht.h>
+
 dht DHT;
 float internalTemperature, internalHumidity;
 
 
 // lux sensor lib and vars
-#include <SparkFunTSL2561.h>
-#include <Wire.h>
+
 unsigned int data0, data1;
 SFE_TSL2561 light;
 boolean gain;     // Gain setting, 0 = X1, 1 = X16;
 unsigned int ms;  // Integration ("shutter") time in milliseconds
 double lux;
+
+// variable for time
+float time;
 
 // declare baud rate
 const unsigned int BAUD_RATE = 9600;
